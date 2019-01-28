@@ -15,8 +15,8 @@
 // <http://www.gnu.org/licenses/>.
 //
 
-#include <array>
 #include <iostream>
+#include <vector>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/utility/binary.hpp>
@@ -111,10 +111,10 @@ class StandardRomeoInvDynCtrl
     package_dirs.push_back(romeo_model_path);
     const string urdfFileName = package_dirs[0] + "/urdf/romeo.urdf";
     robot = new RobotWrapper(urdfFileName, package_dirs, pinocchio::JointModelFreeFlyer());
-    
+
     const string srdfFileName = package_dirs[0] + "/srdf/romeo_collision.srdf";
     pinocchio::srdf::getNeutralConfigurationFromSrdf(robot->model(),srdfFileName);
-    
+
     const unsigned int nv = robot->nv();
     q = robot->model().neutralConfiguration;
     std::cout << "q: " << q.transpose() << std::endl;
@@ -550,7 +550,7 @@ BOOST_AUTO_TEST_CASE ( test_contact_point_invdyn_formulation_acc_force )
   };
 
   Vector3 contactNormal = Vector3::UnitZ();
-  std::array<ContactPoint*, 4> contacts;
+  std::vector<ContactPoint*> contacts;
 
   for (int i = 0; i < 4; i++) {
     ContactPoint* cp = new ContactPoint("contact_" + contactFrames[i], robot,
@@ -561,7 +561,7 @@ BOOST_AUTO_TEST_CASE ( test_contact_point_invdyn_formulation_acc_force )
     cp->useLocalFrame(false);
     tsid->addRigidContact(*cp, 1);
 
-    contacts[i] = cp;
+    contacts.push_back(cp);
   }
 
   // Create an HQP solver
@@ -576,8 +576,8 @@ BOOST_AUTO_TEST_CASE ( test_contact_point_invdyn_formulation_acc_force )
 
     REQUIRE_TASK_FINITE((*comTask));
 
-    for(const auto &cp : contacts) {
-      REQUIRE_CONTACT_FINITE((*cp));
+    for (int i = 0; i < 4; i++) {
+      REQUIRE_CONTACT_FINITE((*contacts[i]));
     }
 
     sol = &(solver->solve(HQPData));
