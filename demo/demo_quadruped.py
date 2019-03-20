@@ -83,8 +83,8 @@ robot.computeAllTerms(data, q, v)
 contacts = 4*[None]
 for i, name in enumerate(contact_frames):
     contacts[i] =tsid.ContactPoint(name, robot, name, contactNormal, mu, fMin, fMax)
-    contacts[i].setKp(kp_contact * matlib.ones(3).T)
-    contacts[i].setKd(2.0 * np.sqrt(kp_contact) * matlib.ones(3).T)
+    contacts[i].setKp(kp_contact * matlib.ones(6).T)
+    contacts[i].setKd(2.0 * np.sqrt(kp_contact) * matlib.ones(6).T)
     H_rf_ref = robot.framePosition(data, robot.model().getFrameId(name))
     contacts[i].setReference(H_rf_ref)
     contacts[i].useLocalFrame(False)
